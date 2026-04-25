@@ -1,46 +1,6 @@
 import { CameraComponent } from "@/components/webCam";
 import { useState } from "react";
-
-const PLANT_CLASSES = [
-  { plant: "Apple", plantNP: "स्याउ", disease: "Apple Scab", diseaseNP: "खुर्चा रोग", healthy: false },
-  { plant: "Apple", plantNP: "स्याउ", disease: "Black Rot", diseaseNP: "कालो सड्ने रोग", healthy: false },
-  { plant: "Apple", plantNP: "स्याउ", disease: "Cedar Apple Rust", diseaseNP: "रतुवा रोग", healthy: false },
-  { plant: "Apple", plantNP: "स्याउ", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Blueberry", plantNP: "ब्लुबेरी", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Cherry", plantNP: "चेरी", disease: "Powdery Mildew", diseaseNP: "सेतो धुलो रोग", healthy: false },
-  { plant: "Cherry", plantNP: "चेरी", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Corn", plantNP: "मकै", disease: "Cercospora Leaf Spot", diseaseNP: "पात दाग रोग", healthy: false },
-  { plant: "Corn", plantNP: "मकै", disease: "Common Rust", diseaseNP: "साधारण रतुवा", healthy: false },
-  { plant: "Corn", plantNP: "मकै", disease: "Northern Leaf Blight", diseaseNP: "पात झुलसा रोग", healthy: false },
-  { plant: "Corn", plantNP: "मकै", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Grape", plantNP: "अंगुर", disease: "Black Rot", diseaseNP: "कालो सड्ने रोग", healthy: false },
-  { plant: "Grape", plantNP: "अंगुर", disease: "Esca (Black Measles)", diseaseNP: "एस्का रोग", healthy: false },
-  { plant: "Grape", plantNP: "अंगुर", disease: "Leaf Blight", diseaseNP: "पात झुलसा", healthy: false },
-  { plant: "Grape", plantNP: "अंगुर", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Orange", plantNP: "सुन्तला", disease: "Citrus Greening", diseaseNP: "सिट्रस हरियाइने रोग", healthy: false },
-  { plant: "Peach", plantNP: "आरु", disease: "Bacterial Spot", diseaseNP: "ब्याक्टेरियल दाग रोग", healthy: false },
-  { plant: "Peach", plantNP: "आरु", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Pepper", plantNP: "खुर्सानी", disease: "Bacterial Spot", diseaseNP: "ब्याक्टेरियल दाग रोग", healthy: false },
-  { plant: "Pepper", plantNP: "खुर्सानी", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Potato", plantNP: "आलु", disease: "Early Blight", diseaseNP: "प्रारम्भिक झुलसा", healthy: false },
-  { plant: "Potato", plantNP: "आलु", disease: "Late Blight", diseaseNP: "ढिलो झुलसा", healthy: false },
-  { plant: "Potato", plantNP: "आलु", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Raspberry", plantNP: "रास्पबेरी", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Soybean", plantNP: "भटमास", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Squash", plantNP: "फर्सी", disease: "Powdery Mildew", diseaseNP: "सेतो धुलो रोग", healthy: false },
-  { plant: "Strawberry", plantNP: "स्ट्रबेरी", disease: "Leaf Scorch", diseaseNP: "पात जलन", healthy: false },
-  { plant: "Strawberry", plantNP: "स्ट्रबेरी", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Bacterial Spot", diseaseNP: "ब्याक्टेरियल दाग रोग", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Early Blight", diseaseNP: "प्रारम्भिक झुलसा", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Late Blight", diseaseNP: "ढिलो झुलसा", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Leaf Mold", diseaseNP: "पात ढुसी", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Septoria Leaf Spot", diseaseNP: "सेप्टोरिया पात दाग", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Spider Mites", diseaseNP: "माकुरा माइट", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Target Spot", diseaseNP: "लक्ष्य दाग", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Yellow Leaf Curl Virus", diseaseNP: "पहेंलो पात कुर्ल्याउने भाइरस", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Mosaic Virus", diseaseNP: "मोजेक भाइरस", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-];
+import { PLANT_CLASSES } from "@/lib/plantClasses";
 
 type PredictionResult = {
   predicted_class: number;
@@ -67,6 +27,7 @@ function LeafIcon() {
 export function HomePage() {
   const [lang, setLang] = useState(true);
   const [result, setResult] = useState<PredictionResult | null>(null);
+  const [selectedPreview, setSelectedPreview] = useState<string | null>(null);
 
   const cls = result !== null ? PLANT_CLASSES[result.predicted_class] : null;
   const confidencePct = result ? Math.round(result.confidence * 100) : 0;
@@ -148,7 +109,7 @@ export function HomePage() {
               {lang ? "Camera" : "क्यामेरा"}
             </h2>
           </div>
-          <CameraComponent onResult={setResult} lang={lang} />
+          <CameraComponent onResult={setResult} onSelectImage={setSelectedPreview} lang={lang} />
         </div>
 
         {/* Results panel */}
@@ -169,6 +130,20 @@ export function HomePage() {
           </div>
 
           <div className="flex flex-col flex-1 p-4 min-h-0 overflow-y-auto">
+            {/* Selected upload image preview */}
+            {selectedPreview && (
+              <div
+                className="rounded-lg overflow-hidden mb-4 flex-shrink-0"
+                style={{ border: "1px solid #e2ddd6" }}
+              >
+                <img
+                  src={selectedPreview}
+                  alt="selected"
+                  style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }}
+                />
+              </div>
+            )}
+
             {cls ? (
               <div className="flex flex-col gap-4">
                 {/* Status badge */}
@@ -243,7 +218,9 @@ export function HomePage() {
                     {lang ? "No diagnosis yet" : "अहिलेसम्म निदान छैन"}
                   </p>
                   <p className="text-xs mt-1" style={{ color: "#a09890" }}>
-                    {lang ? "Capture a photo and press Analyse" : "फोटो खिचेर विश्लेषण गर्नुहोस्"}
+                    {lang
+                      ? "Capture a photo or select an uploaded image"
+                      : "फोटो खिच्नुहोस् वा अपलोड गरिएको छवि छान्नुहोस्"}
                   </p>
                 </div>
               </div>
