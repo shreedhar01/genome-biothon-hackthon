@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import { config } from "./config/index.js";
 import { apiV1Router } from "./api_v1/routes/index.js";
 import { errorHandler } from "./api_v1/middleware/error.middleware.js";
 
@@ -16,4 +17,7 @@ app.use("/api/v1", apiV1Router);
 
 app.use(errorHandler);
 
-export default app;
+const port = config.PORT || 8000;
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
