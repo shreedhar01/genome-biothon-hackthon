@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { MouseEventHandler, useState } from "react";
 import Webcam from "react-webcam";
 import { Button } from "./ui/button";
+import { useSentImage } from "@/lib/api/hooks/processImage";
+import toast from "react-hot-toast";
+import { processImageSchema } from "@/validation/imageProcess";
 
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 480;
 
 export const CameraComponent = () => {
     const [capturedImage, setCapturedImage] = useState<string | null>(null);
+    const sentImageMutation = useSentImage()
 
     const videoConstraints = {
         width: VIDEO_WIDTH,
@@ -33,18 +37,30 @@ export const CameraComponent = () => {
         return new File([u8arr], filename, { type: mime });
     };
 
-    const sendToApi = async () => {
+    const handleSentImage: MouseEventHandler<HTMLButtonElement> = async (e) => {
+        e.preventDefault()
         if (!capturedImage) return;
 
-        // Option 2: send as multipart/form-data (e.g. to a REST upload endpoint)
-        // const file = base64ToFile(capturedImage, "capture.jpg");
-        // const formData = new FormData();
-        // formData.append("file", file);
-        // await fetch("https://your-api.com/upload", {
-        //     method: "POST",
-        //     body: formData,
-        // });
-    };
+        const file = base64ToFile(capturedImage, "capture.jpg");
+
+        const validData = processImageSchema.safeParse({ image: file })
+        if (!validData.success) {
+            toast.error(validData.error.issues[0].message)
+            return
+        }
+
+        const formData = new FormData()
+        formData.append("image", validData.data.image)
+
+        toast.promise(
+            sentImageMutation.mutateAsync(formData),
+            {
+                loading: 'Image is processing...',
+                success: <b>Image processed!</b>,
+                error: <b>Could not send.</b>,
+            }
+        )
+    }
 
     return (
         <>
@@ -53,7 +69,7 @@ export const CameraComponent = () => {
                 <div className="flex flex-col items-center gap-y-2">
                     <img src={capturedImage} alt="captured" width={VIDEO_WIDTH} height={VIDEO_HEIGHT} />
                     <div>
-                        <Button onClick={sendToApi}>Send to API</Button>
+                        <Button onClick={handleSentImage}>Send to API</Button>
                         <Button
                             onClick={() => setCapturedImage(null)}
                             className="bg-green-400"
