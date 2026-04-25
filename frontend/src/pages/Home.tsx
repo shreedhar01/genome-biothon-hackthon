@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { CameraComponent } from "@/components/webCam";
 import { useState } from "react";
 
 export function HomePage() {
@@ -17,8 +18,8 @@ export function HomePage() {
           </Button>
         </div>
       </div>
-      <div className="flex flex-col items-center justify-center w-full md:max-w-7xl h-full bg-green-400">
-        <video id="webcam" width="640" height="480"></video>
+      <div className="flex flex-col items-center w-full md:max-w-7xl h-full bg-green-400 pt-4">
+        <CameraComponent/>
 
         <h1 className="text-4xl font-bold">Welcome to the Home Page!</h1>
       </div>
