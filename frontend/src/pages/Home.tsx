@@ -413,7 +413,7 @@ export function HomePage() {
           <LeafIcon />
           <div>
             <p className="text-base font-semibold leading-tight" style={{ color: "#1a1714" }}>
-              {lang ? "Khet Ko Sathi" : "खेतको साथी"}
+              {lang ? "Krishi Netra" : "कृषि नेत्र"}
             </p>
             <p className="text-[11px] uppercase tracking-widest" style={{ color: "#7a746e", fontFamily: "ui-monospace, monospace" }}>
               {lang ? "Crop Diagnosis" : "बाली रोग निदान"}
