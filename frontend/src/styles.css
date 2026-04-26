@@ -118,5 +118,6 @@ input {
   }
   html {
     @apply font-sans;
+    font-size: 125%; /* 20px base, scales all rem-based text up */
   }
 }
