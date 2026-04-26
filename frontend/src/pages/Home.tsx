@@ -7,7 +7,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
@@ -41,19 +40,16 @@ const PdfReport = forwardRef<HTMLDivElement, { items: ReportItem[]; lang: boolea
       year: "numeric", month: "long", day: "numeric",
     });
 
-    // Collect unique diseases with guide data
-    const uniqueDiseases: Array<{ plant: string; plantNP: string; disease: string; diseaseNP: string; guide: (typeof diseaseGuide)[keyof typeof diseaseGuide] }> = [];
-    const seen = new Set<string>();
-    for (const item of items) {
+    // One guide entry per image (not deduplicated — each image gets its own card)
+    const perImageGuides = items.flatMap((item, i) => {
       const top = item.result[0];
-      if (!top) continue;
+      if (!top) return [];
       const c = PLANT_CLASSES[top.class_index];
-      if (!c || c.healthy) continue;
+      if (!c || c.healthy) return [];
       const key = diseaseKeyMap[c.disease];
-      if (!key || seen.has(key)) continue;
-      seen.add(key);
-      uniqueDiseases.push({ plant: c.plant, plantNP: c.plantNP, disease: c.disease, diseaseNP: c.diseaseNP, guide: diseaseGuide[key] });
-    }
+      if (!key) return [];
+      return [{ index: i + 1, fileName: item.fileName, plant: c.plant, plantNP: c.plantNP, disease: c.disease, diseaseNP: c.diseaseNP, guide: diseaseGuide[key] }];
+    });
 
     return (
       <div
@@ -88,14 +84,14 @@ const PdfReport = forwardRef<HTMLDivElement, { items: ReportItem[]; lang: boolea
           </div>
         </div>
 
-        {/* Detailed treatment guide per disease — shown FIRST */}
-        {uniqueDiseases.length > 0 && (
+        {/* Detailed treatment guide per image — shown FIRST */}
+        {perImageGuides.length > 0 && (
           <div style={{ marginBottom: 36 }}>
             <p style={{ fontSize: 11, fontWeight: 700, color: "#7a746e", letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 16px" }}>
               {lang ? "Treatment Guide" : "उपचार मार्गदर्शन"}
             </p>
 
-            {uniqueDiseases.map((d, idx) => (
+            {perImageGuides.map((d, idx) => (
               <div key={idx} style={{ marginBottom: 28, border: "1px solid #e2ddd6", borderRadius: 10, overflow: "hidden" }}>
                 {/* Disease card header */}
                 <div style={{ background: "#1a1714", padding: "12px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -105,6 +101,8 @@ const PdfReport = forwardRef<HTMLDivElement, { items: ReportItem[]; lang: boolea
                     </p>
                     <p style={{ margin: "2px 0 0", fontSize: 11, color: "#9ec7a3", letterSpacing: "0.04em" }}>
                       {lang ? d.plant : d.plantNP}
+                      {" · "}
+                      <span style={{ opacity: 0.75 }}>#{d.index} {d.fileName}</span>
                     </p>
                   </div>
                   <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 10px", borderRadius: 99, background: "#fde8e3", color: "#7a2a1a" }}>
@@ -137,6 +135,7 @@ const PdfReport = forwardRef<HTMLDivElement, { items: ReportItem[]; lang: boolea
                       </p>
                       <ol style={{ margin: 0, paddingLeft: 16 }}>
                         {(lang ? d.guide.longTerm : (d.guide.longTermNP ?? d.guide.longTerm)).map((action, ai) => (
+
                           <li key={ai} style={{ fontSize: 12, color: "#3d3a37", marginBottom: 5, lineHeight: 1.5 }}>
                             {action}
                           </li>
@@ -515,14 +514,26 @@ export function HomePage() {
           </div>
 
           {/* Dialog footer — fixed */}
-          <DialogFooter className="flex-shrink-0" style={{ borderTop: "1px solid #e2ddd6" }}>
+          <div
+            style={{
+              flexShrink: 0,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 12,
+              borderTop: "1px solid #e2ddd6",
+              padding: "16px 24px",
+              background: "#faf9f6",
+            }}
+          >
             <Button variant="outline" onClick={() => setPdfOpen(false)}>
               {lang ? "Close" : "बन्द गर्नुहोस्"}
             </Button>
             <Button onClick={handleDownloadPdf} disabled={generating}>
               {generating ? (lang ? "Generating…" : "बनाउँदै…") : (lang ? "Download PDF" : "PDF डाउनलोड")}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 
