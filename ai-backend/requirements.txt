@@ -1,5 +1,9 @@
 fastapi
 uvicorn[standard]
 torch
+torchvision
 numpy
-torchvison
+pillow
+tensorflow
+omnivoice
+soundfile
