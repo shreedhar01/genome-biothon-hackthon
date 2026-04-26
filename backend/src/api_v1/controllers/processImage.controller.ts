@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { ApiResponse } from "../../utils/apiResponse";
 import { ApiError } from "../../utils/apiError";
-import { processAudioTextSchema, processImageSchema } from "../../validators/processImage.validation";
-import { processAudioService, processImageService } from "../../services/processImage.service";
+import { processAudioTextSchema, processImageSchema, sendEmailSchema } from "../../validators/processImage.validation";
+import { processAudioService, processImageService, sendEmailService } from "../../services/processImage.service";
 
 export const processImageController = asyncHandler(async (req: Request, res: Response)=>{
     // console.log("FILE:", req.file);
@@ -37,3 +37,14 @@ export const processAudioController = asyncHandler(async (req: Request, res: Res
 
     res.status(200).send(audioBuffer);
 });
+
+export const sentEmailController = asyncHandler(async (req: Request, res: Response)=>{
+    const isValid = sendEmailSchema.safeParse(req.body)
+    if (!isValid.success) {
+        throw new ApiError(400, "Invalid audio input", isValid.error.errors);
+    }
+    const result = await sendEmailService(isValid.data)
+    res.status(200).json(
+        new ApiResponse(200, [result], "Email sent successfully")
+    )
+})

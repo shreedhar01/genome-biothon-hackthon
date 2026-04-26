@@ -1,6 +1,6 @@
 import fs from "fs"
 import FormData from "form-data"
-import { ProcessAudio, ProcessImage } from "../validators/processImage.validation";
+import { ProcessAudio, ProcessImage, SendEmail } from "../validators/processImage.validation";
 import {http} from "../config/axiosApi"
 
 export const processImageService = async (image: ProcessImage) => {
@@ -29,3 +29,7 @@ export const processAudioService = async (data: ProcessAudio) => {
 
     return response.data;
 };
+
+export const sendEmailService = async (data:SendEmail)=>{
+    return "hello"
+}
