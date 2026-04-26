@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { ApiResponse } from "../../utils/apiResponse";
 import { ApiError } from "../../utils/apiError";
-import { processImageSchema } from "../../validators/processImage.validation";
-import { processImageService } from "../../services/processImage.service";
+import { processAudioTextSchema, processImageSchema } from "../../validators/processImage.validation";
+import { processAudioService, processImageService } from "../../services/processImage.service";
 
 export const processImageController = asyncHandler(async (req: Request, res: Response)=>{
     // console.log("FILE:", req.file);
@@ -20,3 +20,20 @@ export const processImageController = asyncHandler(async (req: Request, res: Res
         new ApiResponse(200, [result], "image process successfully")
     )
 })
+
+export const processAudioController = asyncHandler(async (req: Request, res: Response) => {
+    const isValid = processAudioTextSchema.safeParse(req.body);
+
+    if (!isValid.success) {
+        throw new ApiError(400, "Invalid audio input", isValid.error.errors);
+    }
+
+    const audioBuffer = await processAudioService(isValid.data);
+
+    res.setHeader("Content-Type", "audio/mpeg"); 
+    // or "audio/wav" depending on API
+
+    res.setHeader("Content-Disposition", "inline; filename=output.mp3");
+
+    res.status(200).send(audioBuffer);
+});

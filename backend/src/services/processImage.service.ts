@@ -1,6 +1,6 @@
 import fs from "fs"
 import FormData from "form-data"
-import { ProcessImage } from "../validators/processImage.validation";
+import { ProcessAudio, ProcessImage } from "../validators/processImage.validation";
 import {http} from "../config/axiosApi"
 
 export const processImageService = async (image: ProcessImage) => {
@@ -21,3 +21,11 @@ export const processImageService = async (image: ProcessImage) => {
 
     return response.data
 }
+
+export const processAudioService = async (data: ProcessAudio) => {
+    const response = await http.post("/tts/synthesize", data, {
+        responseType: "arraybuffer",
+    });
+
+    return response.data;
+};

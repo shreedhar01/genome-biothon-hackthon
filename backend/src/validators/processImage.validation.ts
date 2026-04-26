@@ -15,3 +15,9 @@ export const processImageSchema = z.object({
     ),
 });
 export type ProcessImage = z.infer<typeof processImageSchema>
+
+
+export const processAudioTextSchema = z.object({
+  text: z.string().min(10,"Must be more then 50 char")
+})
+export type ProcessAudio = z.infer<typeof processAudioTextSchema>
