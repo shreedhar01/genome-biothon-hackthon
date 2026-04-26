@@ -1,5 +1,6 @@
 import { CameraComponent, ReportItem } from "@/components/webCam";
-import { useState, useCallback, useRef, forwardRef } from "react";
+import { useState, useCallback, useRef, forwardRef, useMemo, useEffect } from "react";
+import { useSentTextForAudio } from "@/lib/api/hooks/processImage";
 import { PLANT_CLASSES } from "@/lib/plantClasses";
 import { diseaseGuide } from "@/components/mapDieses";
 import {
@@ -31,6 +32,36 @@ type PredictionResult = {
   condition: string;
   confidence: number;
 };
+
+function buildNepaliGuideText(items: ReportItem[]): string | null {
+  const seen = new Set<string>();
+  const parts: string[] = [];
+
+  for (const item of items) {
+    const top = item.result[0];
+    if (!top) continue;
+    const cls = PLANT_CLASSES[top.class_index];
+    if (!cls || cls.healthy) continue;
+    const key = diseaseKeyMap[cls.disease];
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    const guide = diseaseGuide[key];
+    if (!guide) continue;
+
+    parts.push(`${cls.plantNP} मा ${cls.diseaseNP} रोग देखिएको छ।`);
+    if (guide.immediateNP?.length) {
+      parts.push("तत्काल गर्नुपर्ने कामहरू:");
+      guide.immediateNP.forEach((a) => parts.push(a));
+    }
+    if (guide.longTermNP?.length) {
+      parts.push("दीर्घकालीन उपायहरू:");
+      guide.longTermNP.forEach((a) => parts.push(a));
+    }
+  }
+
+  if (parts.length === 0) return null;
+  return parts.join(" ");
+}
 
 // ─── Simple text-only PDF report (all images in one table) ───────────────────
 
@@ -287,6 +318,33 @@ export function HomePage() {
   const [totalAnalysed, setTotalAnalysed] = useState(0);
 
   const pdfReportRef = useRef<HTMLDivElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
+  const lastGeneratedTextRef = useRef<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+
+  const { mutate: generateAudio, data: audioData, isPending: audioLoading } = useSentTextForAudio();
+
+  const audioGuideText = useMemo(() => {
+    if (lang) return null;
+    return buildNepaliGuideText(reportItems);
+  }, [lang, reportItems]);
+
+  useEffect(() => {
+    if (audioGuideText && audioGuideText !== lastGeneratedTextRef.current) {
+      lastGeneratedTextRef.current = audioGuideText;
+      setAudioUrl(null);
+      generateAudio({ text: audioGuideText });
+    }
+  }, [audioGuideText]);
+
+  useEffect(() => {
+    if (!audioData) return;
+    if (audioUrlRef.current) URL.revokeObjectURL(audioUrlRef.current);
+    const blob = new Blob([audioData as ArrayBuffer], { type: "audio/mpeg" });
+    const url = URL.createObjectURL(blob);
+    audioUrlRef.current = url;
+    setAudioUrl(url);
+  }, [audioData]);
 
   const handleReportItems = useCallback((items: ReportItem[]) => setReportItems(items), []);
   const handleImageAnalysed = useCallback(() => setTotalAnalysed((n) => n + 1), []);
@@ -421,6 +479,24 @@ export function HomePage() {
             {selectedPreview && (
               <div className="rounded-lg overflow-hidden mb-4 flex-shrink-0" style={{ border: "1px solid #e2ddd6" }}>
                 <img src={selectedPreview} alt="selected" style={{ width: "100%", height: 130, objectFit: "cover", display: "block" }} />
+              </div>
+            )}
+
+            {!lang && audioGuideText && (
+              <div style={{ marginBottom: 12, padding: "10px 14px", borderRadius: 10, border: "1px solid #e2ddd6", background: "#f7f5f2", flexShrink: 0 }}>
+                <p style={{ fontSize: 11, fontWeight: 700, color: "#7a746e", letterSpacing: "0.06em", textTransform: "uppercase", margin: "0 0 8px" }}>
+                  उपचार मार्गदर्शन अडियो
+                </p>
+                {audioLoading ? (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <svg className="animate-spin" style={{ flexShrink: 0 }} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7a746e" strokeWidth="2.5" strokeLinecap="round">
+                      <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                    </svg>
+                    <p style={{ fontSize: 12, color: "#7a746e", margin: 0 }}>अडियो तयार गर्दैछ…</p>
+                  </div>
+                ) : audioUrl ? (
+                  <audio controls src={audioUrl} style={{ width: "100%", height: 32, display: "block" }} />
+                ) : null}
               </div>
             )}
 
