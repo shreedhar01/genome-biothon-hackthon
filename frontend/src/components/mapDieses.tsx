@@ -39,9 +39,11 @@ export const diseaseGuide = {
       "Repeat spraying every seven to ten days.",
     ],
     immediateNP: [
-      "गोलाकार धर्के रोग लागेका तल्ला पातहरू हटाउनुहोस्।",
-      "हावा सञ्चार सुधार्नुहोस् र पानीको तनाव नहोस् भनी ध्यान दिनुहोस्।",
-      "हरेक सात देखि दस दिनमा औषधि छर्नुहोस्।",
+      "कृपया गोलभेँडाको अगौटे डढुवा रोग लागेकोमा घेरा देखिने संक्रमित पात हटाउनुहोस्।",
+      "पानीको कमी हुन नदिनुहोस्।",
+      "हरेक ७ देखि १० दिनमा औषधि छर्नुहोस्।",
+      "धन्यवाद।",
+
     ],
     longTerm: [
       "Maintain proper nutrition, especially potassium.",
@@ -50,10 +52,12 @@ export const diseaseGuide = {
       "Use healthy seedlings.",
     ],
     longTermNP: [
-      "उचित पोषण कायम राख्नुहोस्, विशेषगरी पोटासियम।",
+      "कृपया उचित पोषण कायम राख्नुहोस्, विशेषगरी पोटासियम।",
       "तनावको अवस्था हुन नदिनुहोस्।",
       "बाली फेरबदल गर्नुहोस् र फसल काटेपछि बिरुवाका अवशेष हटाउनुहोस्।",
-      "स्वस्थ बिउमा प्रयोग गर्नुहोस्।",
+      "स्वस्थ बिउ प्रयोग गर्नुहोस्।",
+      "धन्यवाद।"
+
     ],
     chemicals: [
       { name: "Mancozeb", dose: "250–300g per ropani" },
@@ -174,30 +178,35 @@ export const diseaseGuide = {
 
   bacterial_spot: {
     immediate: [
-      "Remove infected leaves with spots.",
+      "In case of tomato bacterial spot, please remove infected leaves with spots and destroy them away from the field.",
       "Avoid working in wet fields.",
-      "Repeat spraying every seven days.",
+      "Don't practice overhead irrigation and keep leaves dry.",
+      "Spray chemicals every seven days.",
     ],
     immediateNP: [
-      "दाग लागेका पातहरू हटाउनुहोस्।",
+      "कृपया गोलभेडाको ब्याक्टेरियल दाग रोग लागेकोमा संक्रमित पातहरूलाई हटाएर खेतबाट टाढा नष्ट गर्नुहोस्।",
       "भिजेको खेतमा काम नगर्नुहोस्।",
-      "हरेक सात दिनमा औषधि छर्नुहोस्।",
+      "माथिबाट सिँचाइ नगर्नुहोस् र पात सुक्खा राख्नुहोस्।",
+      "हरेक सात दिनमा औषधि छर्नुहोस्।"
+
+
     ],
     longTerm: [
-      "Use disease-free seeds and seedlings.",
-      "Avoid overhead irrigation.",
+      "Use disease-free seeds and resistant varieties.",
+      "Maintain proper spacing and avoid dense planting.",
       "Practice crop rotation.",
       "Maintain field sanitation.",
     ],
     longTermNP: [
-      "रोगमुक्त बिउ र बिरुवाहरू प्रयोग गर्नुहोस्।",
-      "माथिबाट सिँचाइ नगर्नुहोस्।",
+      "रोगमुक्त बिउ र सहनशील बिउको जात प्रयोग गर्नुहोस्।",
+      "उचित दूरी कायम राख्नुहोस् र बाक्लो रोपाइँ नगर्नुहोस्।",
       "बाली फेरबदल गर्नुहोस्।",
-      "खेतको सफाइ कायम राख्नुहोस्।",
+      "खेत सफा राख्नुहोस्। धन्यवाद।",
+
     ],
     chemicals: [
       { name: "Copper fungicide", dose: "300–350g per ropani" },
-      { name: "Streptocycline", dose: "1g per 10 liters of water" },
+      { name: "Streptocycline", dose: "1g per 10L water" },
     ],
   },
 
