@@ -1,6 +1,7 @@
 import { CameraComponent, ReportItem } from "@/components/webCam";
 import { useState, useCallback, useRef, forwardRef, useMemo, useEffect } from "react";
-import { useSentTextForAudio } from "@/lib/api/hooks/processImage";
+import { useSentTextForAudio, useSentEmail } from "@/lib/api/hooks/processImage";
+import toast from "react-hot-toast";
 import { PLANT_CLASSES } from "@/lib/plantClasses";
 import { diseaseGuide } from "@/components/mapDieses";
 import {
@@ -323,6 +324,7 @@ export function HomePage() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   const { mutate: generateAudio, data: audioData, isPending: audioLoading } = useSentTextForAudio();
+  const { mutate: sendEmail, isPending: emailSending } = useSentEmail();
 
   const audioGuideText = useMemo(() => {
     if (lang) return null;
@@ -348,6 +350,14 @@ export function HomePage() {
 
   const handleReportItems = useCallback((items: ReportItem[]) => setReportItems(items), []);
   const handleImageAnalysed = useCallback(() => setTotalAnalysed((n) => n + 1), []);
+
+  const handleSendEmail = () => {
+    if (reportItems.length === 0) return;
+    sendEmail(
+      { items: reportItems.map(({ fileName, result }) => ({ fileName, result })) },
+      { onSuccess: () => toast.success(lang ? "Report sent to email!" : "इमेलमा पठाइयो!") }
+    );
+  };
 
   const handleDownloadPdf = async () => {
     const el = pdfReportRef.current;
@@ -605,6 +615,9 @@ export function HomePage() {
           >
             <Button variant="outline" onClick={() => setPdfOpen(false)}>
               {lang ? "Close" : "बन्द गर्नुहोस्"}
+            </Button>
+            <Button variant="outline" onClick={handleSendEmail} disabled={emailSending || reportItems.length === 0 || reportItems.some(item => item.result.length === 1 && item.result[0]?.class_index === 15)}>
+              {emailSending ? (lang ? "Sending…" : "पठाउँदै…") : (lang ? "Send Email" : "इमेल पठाउनुहोस्")}
             </Button>
             <Button onClick={handleDownloadPdf} disabled={generating}>
               {generating ? (lang ? "Generating…" : "बनाउँदै…") : (lang ? "Download PDF" : "PDF डाउनलोड")}

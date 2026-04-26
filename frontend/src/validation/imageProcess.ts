@@ -18,6 +18,25 @@ export type ProcessImage = z.infer<typeof processImageSchema>
 
 
 export const processAudioTextSchema = z.object({
-  text: z.string().min(10,"Must be more then 50 char")
+  text: z.string().min(10, "Must be more then 50 char")
 })
 export type ProcessAudio = z.infer<typeof processAudioTextSchema>
+
+
+export const sendEmailSchema = z.object({
+  items: z.array(
+    z.object({
+      fileName: z.string(),
+      result: z.array(
+        z.object({
+          class_index: z.number().int().nonnegative(),
+          plant: z.string(),
+          condition: z.string(),
+          confidence: z.number().min(0).max(1),
+        })
+      ).min(1),
+    })
+  ).min(1),
+});
+
+export type SendEmail = z.infer<typeof sendEmailSchema>;
