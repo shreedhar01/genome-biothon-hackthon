@@ -12,10 +12,12 @@ interface CardProps {
   onAnalyse: (e: React.MouseEvent) => void;
 }
 
-function ItemResult({ result, lang }: { result: PredictionResult; lang: boolean }) {
-  const cls = PLANT_CLASSES[result.predicted_class];
+function ItemResult({ result, lang }: { result: PredictionResult[]; lang: boolean }) {
+  const top = result[0];
+  if (!top) return null;
+  const cls = PLANT_CLASSES[top.class_index];
   if (!cls) return null;
-  const pct = Math.round(result.confidence * 100);
+  const pct = Math.round(top.confidence * 100);
   return (
     <div
       style={{

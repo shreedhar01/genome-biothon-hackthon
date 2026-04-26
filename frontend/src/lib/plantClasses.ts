@@ -1,40 +1,18 @@
 export const PLANT_CLASSES = [
-  { plant: "Apple", plantNP: "स्याउ", disease: "Apple Scab", diseaseNP: "खुर्चा रोग", healthy: false },
-  { plant: "Apple", plantNP: "स्याउ", disease: "Black Rot", diseaseNP: "कालो सड्ने रोग", healthy: false },
-  { plant: "Apple", plantNP: "स्याउ", disease: "Cedar Apple Rust", diseaseNP: "रतुवा रोग", healthy: false },
-  { plant: "Apple", plantNP: "स्याउ", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Blueberry", plantNP: "ब्लुबेरी", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Cherry", plantNP: "चेरी", disease: "Powdery Mildew", diseaseNP: "सेतो धुलो रोग", healthy: false },
-  { plant: "Cherry", plantNP: "चेरी", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Corn", plantNP: "मकै", disease: "Cercospora Leaf Spot", diseaseNP: "पात दाग रोग", healthy: false },
-  { plant: "Corn", plantNP: "मकै", disease: "Common Rust", diseaseNP: "साधारण रतुवा", healthy: false },
-  { plant: "Corn", plantNP: "मकै", disease: "Northern Leaf Blight", diseaseNP: "पात झुलसा रोग", healthy: false },
-  { plant: "Corn", plantNP: "मकै", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Grape", plantNP: "अंगुर", disease: "Black Rot", diseaseNP: "कालो सड्ने रोग", healthy: false },
-  { plant: "Grape", plantNP: "अंगुर", disease: "Esca (Black Measles)", diseaseNP: "एस्का रोग", healthy: false },
-  { plant: "Grape", plantNP: "अंगुर", disease: "Leaf Blight", diseaseNP: "पात झुलसा", healthy: false },
-  { plant: "Grape", plantNP: "अंगुर", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Orange", plantNP: "सुन्तला", disease: "Citrus Greening", diseaseNP: "सिट्रस हरियाइने रोग", healthy: false },
-  { plant: "Peach", plantNP: "आरु", disease: "Bacterial Spot", diseaseNP: "ब्याक्टेरियल दाग रोग", healthy: false },
-  { plant: "Peach", plantNP: "आरु", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Pepper", plantNP: "खुर्सानी", disease: "Bacterial Spot", diseaseNP: "ब्याक्टेरियल दाग रोग", healthy: false },
-  { plant: "Pepper", plantNP: "खुर्सानी", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Potato", plantNP: "आलु", disease: "Early Blight", diseaseNP: "प्रारम्भिक झुलसा", healthy: false },
-  { plant: "Potato", plantNP: "आलु", disease: "Late Blight", diseaseNP: "ढिलो झुलसा", healthy: false },
-  { plant: "Potato", plantNP: "आलु", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Raspberry", plantNP: "रास्पबेरी", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Soybean", plantNP: "भटमास", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Squash", plantNP: "फर्सी", disease: "Powdery Mildew", diseaseNP: "सेतो धुलो रोग", healthy: false },
-  { plant: "Strawberry", plantNP: "स्ट्रबेरी", disease: "Leaf Scorch", diseaseNP: "पात जलन", healthy: false },
-  { plant: "Strawberry", plantNP: "स्ट्रबेरी", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Bacterial Spot", diseaseNP: "ब्याक्टेरियल दाग रोग", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Early Blight", diseaseNP: "प्रारम्भिक झुलसा", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Late Blight", diseaseNP: "ढिलो झुलसा", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Leaf Mold", diseaseNP: "पात ढुसी", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Septoria Leaf Spot", diseaseNP: "सेप्टोरिया पात दाग", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Spider Mites", diseaseNP: "माकुरा माइट", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Target Spot", diseaseNP: "लक्ष्य दाग", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Yellow Leaf Curl Virus", diseaseNP: "पहेंलो पात कुर्ल्याउने भाइरस", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Mosaic Virus", diseaseNP: "मोजेक भाइरस", healthy: false },
-  { plant: "Tomato", plantNP: "टमाटर", disease: "Healthy", diseaseNP: "स्वस्थ", healthy: true },
+  { plant: "Pepper (Bell)", plantNP: "खुर्सानी", disease: "Bacterial Spot",              diseaseNP: "ब्याक्टेरियल दाग रोग",                healthy: false }, // 0
+  { plant: "Pepper (Bell)", plantNP: "खुर्सानी", disease: "Healthy",                      diseaseNP: "स्वस्थ",                              healthy: true  }, // 1
+  { plant: "Potato",        plantNP: "आलु",       disease: "Early Blight",                diseaseNP: "प्रारम्भिक झुलसा",                   healthy: false }, // 2
+  { plant: "Potato",        plantNP: "आलु",       disease: "Late Blight",                 diseaseNP: "ढिलो झुलसा",                          healthy: false }, // 3
+  { plant: "Potato",        plantNP: "आलु",       disease: "Healthy",                      diseaseNP: "स्वस्थ",                              healthy: true  }, // 4
+  { plant: "Tomato",        plantNP: "टमाटर",     disease: "Bacterial Spot",              diseaseNP: "ब्याक्टेरियल दाग रोग",                healthy: false }, // 5
+  { plant: "Tomato",        plantNP: "टमाटर",     disease: "Early Blight",                diseaseNP: "प्रारम्भिक झुलसा",                   healthy: false }, // 6
+  { plant: "Tomato",        plantNP: "टमाटर",     disease: "Late Blight",                 diseaseNP: "ढिलो झुलसा",                          healthy: false }, // 7
+  { plant: "Tomato",        plantNP: "टमाटर",     disease: "Leaf Mold",                   diseaseNP: "पात ढुसी",                             healthy: false }, // 8
+  { plant: "Tomato",        plantNP: "टमाटर",     disease: "Septoria Leaf Spot",          diseaseNP: "सेप्टोरिया पात दाग",                  healthy: false }, // 9
+  { plant: "Tomato",        plantNP: "टमाटर",     disease: "Spider Mites",                diseaseNP: "माकुरा माइट",                          healthy: false }, // 10
+  { plant: "Tomato",        plantNP: "टमाटर",     disease: "Target Spot",                 diseaseNP: "लक्ष्य दाग",                           healthy: false }, // 11
+  { plant: "Tomato",        plantNP: "टमाटर",     disease: "Yellow Leaf Curl Virus",      diseaseNP: "पहेंलो पात कुर्ल्याउने भाइरस",        healthy: false }, // 12
+  { plant: "Tomato",        plantNP: "टमाटर",     disease: "Mosaic Virus",                diseaseNP: "मोजेक भाइरस",                          healthy: false }, // 13
+  { plant: "Tomato",        plantNP: "टमाटर",     disease: "Healthy",                      diseaseNP: "स्वस्थ",                              healthy: true  }, // 14
+  { plant: "Unknown",       plantNP: "अज्ञात",    disease: "Not Recognized",              diseaseNP: "पहिचान भएन",                           healthy: false }, // 15
 ];

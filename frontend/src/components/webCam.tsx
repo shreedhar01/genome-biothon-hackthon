@@ -10,13 +10,14 @@ import type { PredictionResult, UploadItem } from "./camera/types";
 export type { ReportItem } from "./camera/types";
 
 interface Props {
-  onResult?: (result: PredictionResult | null) => void;
+  onResult?: (result: PredictionResult[] | null) => void;
   onSelectImage?: (preview: string | null) => void;
   onReportItems?: (items: import("./camera/types").ReportItem[]) => void;
+  onImageAnalysed?: () => void;
   lang: boolean;
 }
 
-export const CameraComponent = ({ onResult, onSelectImage, onReportItems, lang }: Props) => {
+export const CameraComponent = ({ onResult, onSelectImage, onReportItems, onImageAnalysed, lang }: Props) => {
   const [mode, setMode] = useState<"camera" | "upload">("camera");
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [uploadItems, setUploadItems] = useState<UploadItem[]>([]);
@@ -75,7 +76,7 @@ export const CameraComponent = ({ onResult, onSelectImage, onReportItems, lang }
     itemId: string,
     file: File,
     currentSelectedId: string | null
-  ): Promise<PredictionResult | null> => {
+  ): Promise<PredictionResult[] | null> => {
     setUploadItems((prev) =>
       prev.map((i) => (i.id === itemId ? { ...i, analysing: true } : i))
     );
@@ -83,14 +84,15 @@ export const CameraComponent = ({ onResult, onSelectImage, onReportItems, lang }
     formData.append("image", file);
     try {
       const response = await sentImageMutation.mutateAsync(formData);
-      const result: PredictionResult = response?.data?.[0] ?? null;
+      const results: PredictionResult[] = response?.data?.[0] ?? null;
       setUploadItems((prev) =>
-        prev.map((i) => (i.id === itemId ? { ...i, result, analysing: false } : i))
+        prev.map((i) => (i.id === itemId ? { ...i, result: results, analysing: false } : i))
       );
       if (!currentSelectedId || currentSelectedId === itemId) {
-        onResult?.(result);
+        onResult?.(results);
       }
-      return result;
+      onImageAnalysed?.();
+      return results;
     } catch {
       setUploadItems((prev) =>
         prev.map((i) => (i.id === itemId ? { ...i, analysing: false } : i))
@@ -111,8 +113,8 @@ export const CameraComponent = ({ onResult, onSelectImage, onReportItems, lang }
     setSelectedItemId(itemId);
     if (item) onSelectImage?.(item.preview);
     const toastId = toast.loading(lang ? "Analysing image…" : "विश्लेषण गर्दै…");
-    analyseItem(itemId, file, itemId).then((result) => {
-      if (result) {
+    analyseItem(itemId, file, itemId).then((results) => {
+      if (results) {
         toast.success(lang ? "Diagnosis complete!" : "निदान सम्पन्न!", { id: toastId });
       } else {
         toast.dismiss(toastId);
@@ -152,14 +154,15 @@ export const CameraComponent = ({ onResult, onSelectImage, onReportItems, lang }
         success: lang ? "Diagnosis complete!" : "निदान सम्पन्न!",
         error: lang ? "Could not process image." : "छवि प्रशोधन गर्न सकिएन।",
       });
-      const result: PredictionResult = response?.data?.[0] ?? null;
-      onResult?.(result);
-      if (result) {
+      const results: PredictionResult[] = response?.data?.[0] ?? null;
+      onResult?.(results);
+      onImageAnalysed?.();
+      if (results) {
         onReportItems?.([{
           id: "camera-capture",
           fileName: lang ? "Camera Capture" : "क्यामेरा फोटो",
           preview,
-          result,
+          result: results,
         }]);
       }
     } catch {
