@@ -12,7 +12,7 @@ export const processImageService = async (image: ProcessImage) => {
         contentType: image.image.mimetype,
     })
 
-    const response = await http.post("/predict", form, {
+    const response = await http.post("/plant/predict", form, {
         headers: form.getHeaders(),
     })
     // console.log(response)
