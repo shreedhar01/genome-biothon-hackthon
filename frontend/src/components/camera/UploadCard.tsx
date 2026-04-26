@@ -23,7 +23,7 @@ function ItemResult({ result, lang }: { result: PredictionResult[]; lang: boolea
       style={{
         padding: "6px 7px 5px",
         borderTop: "1px solid #e2ddd6",
-        background: cls.healthy ? "oklch(0.97 0.02 145)" : "oklch(0.97 0.02 30)",
+        background: cls.healthy ? "#f0fdf4" : "#fff7ed",
       }}
     >
       <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: cls.healthy ? "#2d5e36" : "#7a2a1a" }}>
@@ -52,7 +52,7 @@ export function UploadCard({ item, isSelected, anyAnalysing, lang, onClick, onRe
       style={{
         position: "relative", borderRadius: 8, overflow: "hidden",
         border: isSelected ? "2px solid #3f7a4a" : "1px solid #e2ddd6",
-        boxShadow: isSelected ? "0 0 0 3px oklch(0.52 0.13 145 / 0.18)" : "none",
+        boxShadow: isSelected ? "0 0 0 3px rgba(63, 122, 74, 0.18)" : "none",
         background: "#f5f3ee", display: "flex", flexDirection: "column",
         cursor: "pointer", transition: "border-color 0.15s, box-shadow 0.15s",
       }}

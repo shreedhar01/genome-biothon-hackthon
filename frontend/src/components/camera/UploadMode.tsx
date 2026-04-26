@@ -48,7 +48,7 @@ export function UploadMode({
         <div style={{ flex: 1, minHeight: 0, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div
             onClick={() => fileInputRef.current?.click()}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#3f7a4a"; e.currentTarget.style.background = "oklch(0.95 0.04 145)"; }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#3f7a4a"; e.currentTarget.style.background = "#dcfce7"; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#c8c2ba"; e.currentTarget.style.background = "#faf9f6"; }}
             style={{
               display: "flex", flexDirection: "column", alignItems: "center", gap: 12,

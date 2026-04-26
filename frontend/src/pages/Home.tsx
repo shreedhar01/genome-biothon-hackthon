@@ -1,6 +1,7 @@
 import { CameraComponent, ReportItem } from "@/components/webCam";
 import { useState, useCallback, useRef, forwardRef } from "react";
 import { PLANT_CLASSES } from "@/lib/plantClasses";
+import { diseaseGuide } from "@/components/mapDieses";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +12,19 @@ import {
 import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+
+const diseaseKeyMap: Record<string, keyof typeof diseaseGuide> = {
+  "Bacterial Spot": "bacterial_spot",
+  "Early Blight": "early_blight",
+  "Late Blight": "late_blight",
+  "Yellow Leaf Curl Virus": "leaf_curl_virus",
+  "Bacterial Wilt": "bacterial_wilt",
+  "Downy Mildew": "downy_mildew",
+  "Powdery Mildew": "powdery_mildew",
+  "Fruit Borer": "fruit_borer",
+  "Whitefly": "whitefly",
+  "Leaf Miner": "leaf_miner",
+};
 
 type PredictionResult = {
   class_index: number;
@@ -27,13 +41,27 @@ const PdfReport = forwardRef<HTMLDivElement, { items: ReportItem[]; lang: boolea
       year: "numeric", month: "long", day: "numeric",
     });
 
+    // Collect unique diseases with guide data
+    const uniqueDiseases: Array<{ plant: string; plantNP: string; disease: string; diseaseNP: string; guide: (typeof diseaseGuide)[keyof typeof diseaseGuide] }> = [];
+    const seen = new Set<string>();
+    for (const item of items) {
+      const top = item.result[0];
+      if (!top) continue;
+      const c = PLANT_CLASSES[top.class_index];
+      if (!c || c.healthy) continue;
+      const key = diseaseKeyMap[c.disease];
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      uniqueDiseases.push({ plant: c.plant, plantNP: c.plantNP, disease: c.disease, diseaseNP: c.diseaseNP, guide: diseaseGuide[key] });
+    }
+
     return (
       <div
         ref={ref}
-        style={{ width: 800, padding: 56, background: "#ffffff", fontFamily: "'Inter', system-ui, sans-serif" }}
+        style={{ width: 794, padding: "48px 56px", background: "#ffffff", fontFamily: "'Inter', system-ui, sans-serif" }}
       >
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 36, paddingBottom: 20, borderBottom: "2px solid #1a1714" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 32, paddingBottom: 20, borderBottom: "2px solid #1a1714" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ width: 44, height: 44, borderRadius: 10, background: "#3f7a4a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
               <svg width="24" height="24" viewBox="0 0 34 34" fill="none">
@@ -60,15 +88,110 @@ const PdfReport = forwardRef<HTMLDivElement, { items: ReportItem[]; lang: boolea
           </div>
         </div>
 
-        {/* Results table */}
+        {/* Detailed treatment guide per disease — shown FIRST */}
+        {uniqueDiseases.length > 0 && (
+          <div style={{ marginBottom: 36 }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: "#7a746e", letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 16px" }}>
+              {lang ? "Treatment Guide" : "उपचार मार्गदर्शन"}
+            </p>
+
+            {uniqueDiseases.map((d, idx) => (
+              <div key={idx} style={{ marginBottom: 28, border: "1px solid #e2ddd6", borderRadius: 10, overflow: "hidden" }}>
+                {/* Disease card header */}
+                <div style={{ background: "#1a1714", padding: "12px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <div>
+                    <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#fff", fontFamily: "Georgia, serif" }}>
+                      {lang ? d.disease : d.diseaseNP}
+                    </p>
+                    <p style={{ margin: "2px 0 0", fontSize: 11, color: "#9ec7a3", letterSpacing: "0.04em" }}>
+                      {lang ? d.plant : d.plantNP}
+                    </p>
+                  </div>
+                  <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 10px", borderRadius: 99, background: "#fde8e3", color: "#7a2a1a" }}>
+                    {lang ? "Disease Detected" : "रोग पहिचान"}
+                  </span>
+                </div>
+
+                <div style={{ padding: "16px 18px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  {/* Immediate actions */}
+                  {d.guide.immediate && d.guide.immediate.length > 0 && (
+                    <div>
+                      <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, color: "#b55a1a", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                        {lang ? "Immediate Actions" : "तत्काल कदमहरू"}
+                      </p>
+                      <ol style={{ margin: 0, paddingLeft: 16 }}>
+                        {(lang ? d.guide.immediate : (d.guide.immediateNP ?? d.guide.immediate)).map((action, ai) => (
+                          <li key={ai} style={{ fontSize: 12, color: "#3d3a37", marginBottom: 5, lineHeight: 1.5 }}>
+                            {action}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+
+                  {/* Long-term actions */}
+                  {d.guide.longTerm && d.guide.longTerm.length > 0 && (
+                    <div>
+                      <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, color: "#3f7a4a", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                        {lang ? "Long-term Prevention" : "दीर्घकालीन रोकथाम"}
+                      </p>
+                      <ol style={{ margin: 0, paddingLeft: 16 }}>
+                        {(lang ? d.guide.longTerm : (d.guide.longTermNP ?? d.guide.longTerm)).map((action, ai) => (
+                          <li key={ai} style={{ fontSize: 12, color: "#3d3a37", marginBottom: 5, lineHeight: 1.5 }}>
+                            {action}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+                </div>
+
+                {/* Chemical treatments */}
+                {d.guide.chemicals && d.guide.chemicals.length > 0 && (
+                  <div style={{ borderTop: "1px solid #e2ddd6", padding: "12px 18px", background: "#f7f5f2" }}>
+                    <p style={{ margin: "0 0 8px", fontSize: 11, fontWeight: 700, color: "#1a1714", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                      {lang ? "Recommended Chemicals" : "सिफारिस रसायनहरू"}
+                    </p>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+                      <thead>
+                        <tr>
+                          <th style={{ padding: "6px 12px", textAlign: "left", background: "#e2ddd6", fontWeight: 600, color: "#1a1714", borderRadius: "4px 0 0 4px" }}>
+                            {lang ? "Chemical Name" : "रसायनको नाम"}
+                          </th>
+                          <th style={{ padding: "6px 12px", textAlign: "left", background: "#e2ddd6", fontWeight: 600, color: "#1a1714", borderRadius: "0 4px 4px 0" }}>
+                            {lang ? "Dose (per ropani)" : "मात्रा (प्रति रोपनी)"}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {d.guide.chemicals.map((chem, ci) => (
+                          <tr key={ci} style={{ background: ci % 2 === 0 ? "#ffffff" : "#f0ece6" }}>
+                            <td style={{ padding: "7px 12px", color: "#1a1714", fontWeight: 500, borderBottom: "1px solid #ece8e2" }}>{chem.name}</td>
+                            <td style={{ padding: "7px 12px", color: "#5a5550", fontFamily: "ui-monospace, monospace", borderBottom: "1px solid #ece8e2" }}>{chem.dose}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Analysis summary table — shown LAST */}
+        <p style={{ fontSize: 11, fontWeight: 700, color: "#7a746e", letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 10px" }}>
+          {lang ? "Analysis Summary" : "विश्लेषण सारांश"}
+        </p>
+
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
           <thead>
             <tr style={{ background: "#1a1714" }}>
               <th style={{ padding: "10px 14px", color: "#fff", fontWeight: 600, textAlign: "left", width: 36 }}>#</th>
-              <th style={{ padding: "10px 14px", color: "#fff", fontWeight: 600, textAlign: "left", width: "28%" }}>
+              <th style={{ padding: "10px 14px", color: "#fff", fontWeight: 600, textAlign: "left", width: "26%" }}>
                 {lang ? "File Name" : "फाइल नाम"}
               </th>
-              <th style={{ padding: "10px 14px", color: "#fff", fontWeight: 600, textAlign: "left", width: "18%" }}>
+              <th style={{ padding: "10px 14px", color: "#fff", fontWeight: 600, textAlign: "left", width: "16%" }}>
                 {lang ? "Plant" : "बिरुवा"}
               </th>
               <th style={{ padding: "10px 14px", color: "#fff", fontWeight: 600, textAlign: "left" }}>
@@ -319,7 +442,7 @@ export function HomePage() {
                             <p style={{ fontSize: 11, color: "#5a5550", margin: 0 }}>{lang ? cls.disease : cls.diseaseNP}</p>
                           </div>
                         </div>
-                        <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 99, flexShrink: 0, background: cls.healthy ? "oklch(0.95 0.04 145)" : "oklch(0.96 0.03 30)", color: cls.healthy ? "#2d5e36" : "#7a2a1a", border: `1px solid ${cls.healthy ? "oklch(0.85 0.07 145)" : "oklch(0.88 0.06 30)"}` }}>
+                        <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 99, flexShrink: 0, background: cls.healthy ? "#dcfce7" : "#fff7ed", color: cls.healthy ? "#2d5e36" : "#7a2a1a", border: `1px solid ${cls.healthy ? "#bbf7d0" : "#fed7aa"}` }}>
                           {cls.healthy ? (lang ? "Healthy" : "स्वस्थ") : (lang ? "Disease" : "रोग")}
                         </span>
                       </div>
@@ -351,23 +474,48 @@ export function HomePage() {
         </div>
       </div>
 
-      {/* PDF Dialog */}
+      {/* PDF Dialog — full A4-proportioned, scrollable */}
       <Dialog open={pdfOpen} onOpenChange={setPdfOpen}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
+        <DialogContent
+          className="flex flex-col gap-0 p-0 overflow-hidden"
+          style={{
+            width: "min(900px, 96vw)",
+            maxWidth: "none",
+            height: "92vh",
+            maxHeight: "92vh",
+          }}
+        >
+          {/* Dialog header — fixed */}
+          <DialogHeader className="px-5 py-3.5 flex-shrink-0" style={{ borderBottom: "1px solid #e2ddd6" }}>
             <DialogTitle>
               {lang ? "Diagnosis Report" : "निदान प्रतिवेदन"}
             </DialogTitle>
           </DialogHeader>
 
-          {/* Scaled preview of the exact PDF content */}
-          <div style={{ maxHeight: "62vh", overflowY: "auto", background: "#f0ece6", padding: 16, borderRadius: 8 }}>
-            <div style={{ zoom: 0.65, boxShadow: "0 4px 24px rgba(0,0,0,0.15)", borderRadius: 2, display: "inline-block", width: "100%" }}>
-              <PdfReport items={reportItems} lang={lang} />
+          {/* Scrollable A4 preview — this is the element captured for PDF */}
+          <div
+            style={{
+              flex: 1,
+              overflowY: "auto",
+              overflowX: "auto",
+              background: "#e8e4de",
+              padding: "20px 24px",
+            }}
+          >
+            <div
+              style={{
+                width: 794,
+                margin: "0 auto",
+                boxShadow: "0 4px 32px rgba(0,0,0,0.18)",
+                borderRadius: 3,
+              }}
+            >
+              <PdfReport ref={pdfReportRef} items={reportItems} lang={lang} />
             </div>
           </div>
 
-          <DialogFooter>
+          {/* Dialog footer — fixed */}
+          <DialogFooter className="flex-shrink-0" style={{ borderTop: "1px solid #e2ddd6" }}>
             <Button variant="outline" onClick={() => setPdfOpen(false)}>
               {lang ? "Close" : "बन्द गर्नुहोस्"}
             </Button>
@@ -378,10 +526,6 @@ export function HomePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Off-screen full-size report for html2canvas */}
-      <div style={{ position: "fixed", left: -9999, top: 0, zIndex: -1, pointerEvents: "none" }}>
-        <PdfReport ref={pdfReportRef} items={reportItems} lang={lang} />
-      </div>
     </div>
   );
 }
