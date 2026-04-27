@@ -14,6 +14,9 @@ import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
+const toNepaliNum = (n: number) =>
+  String(n).replace(/\d/g, (d) => "०१२३४५६७८९"[+d]);
+
 const diseaseKeyMap: Record<string, keyof typeof diseaseGuide> = {
   "Bacterial Spot": "bacterial_spot",
   "Early Blight": "early_blight",
@@ -427,13 +430,13 @@ export function HomePage() {
               className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium tabular-nums"
               style={{ background: "#fff", border: "1px solid #e2ddd6", color: "#3f7a4a", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}
             >
-              {totalAnalysed}
-              <span style={{ color: "#7a746e", fontWeight: 400 }}>{lang ? "analysed" : "विश्लेषण"}</span>
+              {lang ? totalAnalysed : toNepaliNum(totalAnalysed)}
+              <span style={{ color: "#7a746e", fontWeight: 400 }}>{lang ? "FarmCoin" : "कृषिसिक्का"}</span>
             </div>
           )}
           <div className="inline-flex p-[3px] rounded-full" style={{ background: "#fff", border: "1px solid #e2ddd6", boxShadow: "0 1px 2px rgba(0,0,0,0.06)" }}>
             <button onClick={() => setLang(true)} className="px-3 py-1.5 rounded-full text-xs font-medium transition-all" style={lang ? { background: "#1a1714", color: "#fff" } : { background: "transparent", color: "#7a746e" }}>EN</button>
-            <button onClick={() => setLang(false)} className="px-3 py-1.5 rounded-full text-xs font-medium transition-all" style={!lang ? { background: "#1a1714", color: "#fff" } : { background: "transparent", color: "#7a746e" }}>NP</button>
+            <button onClick={() => setLang(false)} className="px-3 py-1.5 rounded-full text-xs font-medium transition-all" style={!lang ? { background: "#1a1714", color: "#fff" } : { background: "transparent", color: "#7a746e" }}>नेप</button>
           </div>
         </div>
       </header>
